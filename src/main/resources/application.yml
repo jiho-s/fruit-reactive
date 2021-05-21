@@ -3,6 +3,12 @@ spring:
     url: r2dbc:h2:mem:fruit;MODE=MYSQL
     username: sa
     password:
+    hikari:
+      schema: h2
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
 logging:
   level:
     org:
