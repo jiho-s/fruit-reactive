@@ -1,0 +1,10 @@
+spring:
+  datasource:
+    url: r2dbc:h2:mem:fruit;MODE=MYSQL
+    username: sa
+    password:
+logging:
+  level:
+    org:
+      springframework:
+        r2dbc: DEBUG
