@@ -8,5 +8,5 @@ class NotFoundException(targetName: String, vararg values: Any)
         const val MESSAGE_KEY = "error.notfound"
         const val MESSAGE_DETAILS = "error.notfound.details"
     }
-    constructor(klass: KClass<Any>, vararg values: Any) : this(klass.simpleName ?: "Klass", values)
+    constructor(klass: KClass<out Any>, vararg values: Any) : this(klass.simpleName ?: "Klass", values)
 }
