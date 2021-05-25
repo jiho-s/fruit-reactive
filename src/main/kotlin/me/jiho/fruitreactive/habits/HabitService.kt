@@ -1,9 +1,11 @@
 package me.jiho.fruitreactive.habits
 
+import me.jiho.fruitreactive.errors.NotFoundException
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
+import reactor.kotlin.core.publisher.switchIfEmpty
 import java.time.LocalDate
 
 @Service
@@ -15,13 +17,17 @@ class HabitService(private val habitRepository: HabitRepository, private val hab
 
     @Transactional
     fun update(accountId: Long, habitId: Long, name: String?, description: String?): Mono<Habit> =
-        Mono.from(habitRepository.findByIdAndAccountId(habitId, accountId)).flatMap { habit ->
+        Mono.from(habitRepository.findByIdAndAccountId(habitId, accountId)).switchIfEmpty {
+            Mono.error(NotFoundException(Habit::class, habitId))
+        }.flatMap { habit ->
             habitRepository.save(habit.copy(name = name ?: habit.name, description = description ?: habit.description))
         }
 
     @Transactional
     fun delete(accountId: Long, habitId: Long): Mono<Void> =
-        Mono.from(habitRepository.findByIdAndAccountId(habitId, accountId)).flatMap { habit ->
+        Mono.from(habitRepository.findByIdAndAccountId(habitId, accountId)).switchIfEmpty {
+            Mono.error(NotFoundException(Habit::class, habitId))
+        }.flatMap { habit ->
             habitRepository.delete(habit)
         }
 
@@ -33,5 +39,20 @@ class HabitService(private val habitRepository: HabitRepository, private val hab
             Flux.fromIterable(it.t1).map { habit -> HabitResult(habit, it.t2.containsKey(habit.id)) }
         }
 
+    @Transactional
+    fun doHabit(accountId: Long, habitId: Long, date: LocalDate): Mono<HabitResult> =
+        Mono.from(habitRepository.findByIdAndAccountId(habitId, accountId)).switchIfEmpty {
+            Mono.error(NotFoundException(Habit::class, habitId))
+        }.flatMap { habit ->
+            habitExecutionDateRepository.save(HabitExecutionDate(date = date, habitId = habit.id, accountId = habit.accountId)).map { HabitResult(habit, true) }
+        }
+
+    @Transactional
+    fun undoHabit(accountId: Long, habitId: Long, date: LocalDate): Mono<Void> =
+        Mono.from(habitExecutionDateRepository.findByHabitIdAndAccountIdAndDate(habitId = habitId, accountId = accountId, date = date)).switchIfEmpty {
+            Mono.error(NotFoundException(HabitExecutionDate::class, habitId, date))
+        }.flatMap {
+            habitExecutionDateRepository.delete(it)
+        }
 }
 
