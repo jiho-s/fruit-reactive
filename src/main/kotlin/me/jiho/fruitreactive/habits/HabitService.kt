@@ -12,7 +12,7 @@ import java.time.LocalDate
 class HabitService(private val habitRepository: HabitRepository, private val habitExecutionDateRepository: HabitExecutionDateRepository) {
 
     @Transactional
-    fun create(accountId: Long, name: String, description: String): Mono<Habit> =
+    fun create(accountId: Long, name: String, description: String?): Mono<Habit> =
         Mono.from(habitRepository.save(Habit(name= name, description = description, accountId = accountId)))
 
     @Transactional
