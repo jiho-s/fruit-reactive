@@ -8,7 +8,7 @@ import java.time.LocalDate
 
 interface HabitExecutionDateRepository: R2dbcRepository<HabitExecutionDate, Long> {
 
-    fun findByHabitIdAndDate(habitId: Long, date: LocalDate): Mono<HabitExecutionDate>
+    fun findByHabitIdAndAccountIdAndDate(habitId: Long, accountId: Long, date: LocalDate): Mono<HabitExecutionDate>
 
     fun findAllByHabitIdInAndDate(habitIds: List<Long?>, date: LocalDate): Flux<HabitExecutionDate>
 }
