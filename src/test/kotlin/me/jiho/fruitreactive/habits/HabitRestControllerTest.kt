@@ -70,4 +70,11 @@ internal class HabitRestControllerTest {
             .bodyValue(objectMapper.writeValueAsString(habitRequest))
             .exchange().expectStatus().is5xxServerError.expectBody().consumeWith { print(it) }
     }
+
+    @Test
+    @DisplayName("삭제 테스트")
+    fun delete() {
+        webTestClient.delete().uri("/api/habit/{habitId}", 1L)
+            .exchange().expectStatus().isNoContent.expectBody().consumeWith { print(it) }
+    }
 }
