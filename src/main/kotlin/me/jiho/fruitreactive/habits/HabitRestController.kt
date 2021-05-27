@@ -4,6 +4,7 @@ import me.jiho.fruitreactive.commons.ApiResult
 import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.*
 import reactor.core.publisher.Mono
+import reactor.kotlin.core.publisher.switchIfEmpty
 import java.time.LocalDate
 
 @RestController
@@ -30,8 +31,8 @@ class HabitRestController(private val habitService: HabitService) {
 
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @DeleteMapping("/{habitId}")
-    fun delete(@PathVariable habitId: Long): Mono<ApiResult<Void>> =
-        habitService.delete(id, habitId).map(ApiResult.Companion::success)
+    fun delete(@PathVariable habitId: Long): Mono<ApiResult<Any>> =
+        habitService.delete(id, habitId).then(Mono.just(ApiResult.success(null)))
 
     @PatchMapping("/do/{habitId}")
     fun doHabit(@PathVariable habitId: Long): Mono<ApiResult<HabitResult>> =
@@ -40,5 +41,5 @@ class HabitRestController(private val habitService: HabitService) {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @PatchMapping("/undo/{habitId}")
     fun undoHabit(@PathVariable habitId: Long): Mono<ApiResult<Void>> =
-        habitService.undoHabit(id, habitId, LocalDate.now()).map(ApiResult.Companion::success)
+        habitService.undoHabit(id, habitId, LocalDate.now()).then(Mono.just(ApiResult.success(null)))
 }
