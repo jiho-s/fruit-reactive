@@ -40,6 +40,6 @@ class HabitRestController(private val habitService: HabitService) {
 
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @PatchMapping("/undo/{habitId}")
-    fun undoHabit(@PathVariable habitId: Long): Mono<ApiResult<Void>> =
+    fun undoHabit(@PathVariable habitId: Long): Mono<ApiResult<Any>> =
         habitService.undoHabit(id, habitId, LocalDate.now()).then(Mono.just(ApiResult.success(null)))
 }
